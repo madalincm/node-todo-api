@@ -38,5 +38,3 @@ newTodo2.save().then((doc) =>{
 }, (e) => {
     console.log("Unable to save todo");
 })
-
-//test
