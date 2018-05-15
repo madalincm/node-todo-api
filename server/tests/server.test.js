@@ -1,13 +1,16 @@
 const expect = require("expect");
 const request = require("supertest");
+const {ObjectId} = require("mongodb");
 
 const {app} = require("./../server");
 const {Todo} = require("./../models/todo");
 
 const todos = [{
+    _id: new ObjectId(),
     text: "first test todo"
 },
 {
+    _id: new ObjectId(),
     text: "second test todo"
 }];
 
@@ -44,7 +47,6 @@ describe("Post /todos", () =>{
 
  it("should not create todo", (done) => {
     var text = "";
-
     request(app)
     .post("/todos")
     .send({text})
@@ -59,8 +61,9 @@ describe("Post /todos", () =>{
         }).catch((e) => done(e));
     });
  });
+});
 
- describe("GET /todos", () => {
+describe("GET /todos", () => {
     it("should get all todos", (done) =>{
         request(app)
         .get("/todos")
@@ -72,8 +75,61 @@ describe("Post /todos", () =>{
     });
  });
 
+ describe("Get /todos/:id", () => {
+    it("should return todo doc", (done) => {
+        request(app)
+        .get(`/todos/${todos[0]._id.toHexString()}`)
+        .expect(200)
+        .expect((res) => {
+            expect(res.body.todo.text).toBe(todos[0].text);
+        })
+        .end(done);
+    });
 
-});
+    it("should return 404 if not found", (done) => {
+        var inexistentId = new ObjectId().toHexString();
+        request(app)
+        .get(`/todos/${inexistentId}`)
+        .expect(404)
+        .end(done);
+    });
 
+    it("should return 404 for non-object ids", (done) => {
+        var invalidId = "123";
+        request(app)
+        .get(`/todos/${invalidId}`)
+        .expect(404)
+        .end(done);
+    });
+ });
 
-//test
+ describe("Delete /todos/:id", () => {
+    it("should delete todo doc", (done) => {
+        validId = todos[0]._id.toHexString();
+
+        request(app)
+        .delete(`/todos/${validId}`)
+        .expect(200)
+        .expect((res) => {
+            expect(res.body.todo._id).toBe(validId);
+        })
+        .end(done);
+    });
+
+    it("should return 404 if not found", (done) => {
+        var inexistentId = new ObjectId().toHexString();
+        request(app)
+        .delete(`/todos/${inexistentId}`)
+        .expect(404)
+        .end(done);
+    });
+
+    it("should return 404 for non-object ids", (done) => {
+        var invalidId = "123";
+        request(app)
+        .delete(`/todos/${invalidId}`)
+        .expect(404)
+        .end(done);
+    });
+
+ })
