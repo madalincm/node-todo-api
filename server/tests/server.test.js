@@ -24,6 +24,8 @@ beforeEach((done) => {
     });
 });
 
+//test
+
 describe("Post /todos", () =>{
  it("should create a new todo", (done) => {
     var text = "Test todo text";
@@ -44,7 +46,7 @@ describe("Post /todos", () =>{
             expect(todos[0].text).toBe(text);
             done();
         }).catch((e) => done(e));
-    });
+    })
  });
 
  it("should not create todo", (done) => {
